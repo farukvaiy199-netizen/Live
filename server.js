@@ -48,9 +48,13 @@ wss.on('connection', (ws, req) => {
 
         console.log('[relay] ffmpeg শুরু হচ্ছে →', rtmpTarget.replace(/\/[^/]+$/, '/***'));
         ffmpegProcess = spawn('ffmpeg', [
-          '-fflags', '+genpts',
+          '-fflags', '+genpts+igndts',
+          '-analyzeduration', '5000000',
+          '-probesize', '5000000',
           '-re',
           '-i', 'pipe:0',
+          '-map', '0:v:0',
+          '-map', '0:a:0?',
           '-c:v', 'libx264',
           '-preset', 'veryfast',
           '-tune', 'zerolatency',
@@ -62,6 +66,7 @@ wss.on('connection', (ws, req) => {
           '-c:a', 'aac',
           '-b:a', '128k',
           '-ar', '44100',
+          '-ac', '2',
           '-f', 'flv',
           rtmpTarget
         ]);
